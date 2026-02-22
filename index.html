@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ukori - Jeux Vidéo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; min-height: 100vh; color: #fff; }
+
+        header {
+            background: rgba(0,0,0,0.6);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #e94560;
+        }
+        header img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #e94560; }
+        header h1 { font-size: 1.5rem; color: #e94560; }
+
+        nav {
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        nav button {
+            background: #333;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        nav button:hover, nav button.active { background: #e94560; border-color: #e94560; }
+
+        main { padding: 20px; max-width: 1400px; margin: 0 auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        h2 { margin-bottom: 20px; font-size: 1.3rem; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        h3 { margin: 25px 0 15px; font-size: 1.1rem; color: #e94560; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: #2a2a4a;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-info { padding: 12px; }
+        .card-info h4 { font-size: 0.85rem; word-break: break-word; }
+        .card-info small { opacity: 0.6; font-size: 0.75rem; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal img { max-width: 90%; max-height: 85vh; object-fit: contain; border-radius: 10px; }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+        }
+        .modal-info {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .card img { height: 150px; }
+        }
+
+        /* Armes Prototype */
+        .weapon-placeholder {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+        }
+        .weapon-placeholder.star5 { background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #ffd700 100%); border: 2px solid #ffd700; }
+        .weapon-placeholder.star4 { background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #a855f7 100%); border: 2px solid #a855f7; }
+        .weapon-placeholder.star3 { background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #3b82f6 100%); border: 2px solid #3b82f6; }
+        .weapon-placeholder .proto-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+        }
+        .weapon-placeholder .stars-display {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            color: #ffd700;
+        }
+        .rarity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+        .rarity-badge.star5 { background: #ffd700; color: #000; }
+        .rarity-badge.star4 { background: #a855f7; color: #fff; }
+        .rarity-badge.star3 { background: #3b82f6; color: #fff; }
+
+        .summary-box {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .summary-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        .summary-item .number { font-size: 2rem; font-weight: bold; color: #e94560; }
+        .summary-item .label { font-size: 0.85rem; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="assets/logo.jpg" alt="Logo">
+        <h1>UKORI</h1>
+    </header>
+
+    <nav>
+        <button class="active" onclick="showSection('perso')">Personnages</button>
+        <button onclick="showSection('monstre')">Monstres</button>
+        <button onclick="showSection('map')">Maps</button>
+        <button onclick="showSection('item')">Items</button>
+        <button onclick="showSection('armes')">Armes (30)</button>
+        <button onclick="showSection('animeaux')">Animaux</button>
+        <button onclick="showSection('competance')">Compétences</button>
+    </nav>
+
+    <main>
+        <!-- PERSONNAGES -->
+        <section id="perso" class="section active">
+            <h2>Personnages</h2>
+
+            <h3>Dieu (5)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/dieu/idée perso  1.jpg', 'Dieu - idée perso 1')">
+                    <img src="assets/perso/dieu/idée perso  1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>dieu</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/dieu/idée perso  2.jpg', 'Dieu - idée perso 2')">
+                    <img src="assets/perso/dieu/idée perso  2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>dieu</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/dieu/idée perso  3.jpg', 'Dieu - idée perso 3')">
+                    <img src="assets/perso/dieu/idée perso  3.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 3</h4><small>dieu</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/dieu/idée perso  4.jpg', 'Dieu - idée perso 4')">
+                    <img src="assets/perso/dieu/idée perso  4.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 4</h4><small>dieu</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/dieu/dieu du temps/idée perso 1.jpg', 'Dieu du temps - idée perso 1')">
+                    <img src="assets/perso/dieu/dieu du temps/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>dieu du temps</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Angélique (3)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple angelique/idée perso  1.jpg', 'Peuple angélique - idée perso 1')">
+                    <img src="assets/perso/peuple angelique/idée perso  1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple angelique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple angelique/idée perso  2.jpg', 'Peuple angélique - idée perso 2')">
+                    <img src="assets/perso/peuple angelique/idée perso  2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>peuple angelique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple angelique/idée perso 3.jpg', 'Peuple angélique - idée perso 3')">
+                    <img src="assets/perso/peuple angelique/idée perso 3.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 3</h4><small>peuple angelique</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Draconique (4)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple draconique/idée perso 1.jpg', 'Peuple draconique - idée perso 1')">
+                    <img src="assets/perso/peuple draconique/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple draconique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple draconique/idée perso 2 (reine des dragon).jpg', 'Peuple draconique - reine des dragon')">
+                    <img src="assets/perso/peuple draconique/idée perso 2 (reine des dragon).jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2 (reine des dragon)</h4><small>peuple draconique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple draconique/idée perso 3.jpg', 'Peuple draconique - idée perso 3')">
+                    <img src="assets/perso/peuple draconique/idée perso 3.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 3</h4><small>peuple draconique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple draconique/idée perso 4.jpg', 'Peuple draconique - idée perso 4')">
+                    <img src="assets/perso/peuple draconique/idée perso 4.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 4</h4><small>peuple draconique</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Démoniaque (gentil) (5)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple demoniaque (gentil)/idée perso 1.jpg', 'Peuple démoniaque - idée perso 1')">
+                    <img src="assets/perso/peuple demoniaque (gentil)/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple demoniaque (gentil)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple demoniaque (gentil)/idée perso 2.jpg', 'Peuple démoniaque - idée perso 2')">
+                    <img src="assets/perso/peuple demoniaque (gentil)/idée perso 2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>peuple demoniaque (gentil)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple demoniaque (gentil)/idée perso 3.jpg', 'Peuple démoniaque - idée perso 3')">
+                    <img src="assets/perso/peuple demoniaque (gentil)/idée perso 3.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 3</h4><small>peuple demoniaque (gentil)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple demoniaque (gentil)/idée perso 4.jpg', 'Peuple démoniaque - idée perso 4')">
+                    <img src="assets/perso/peuple demoniaque (gentil)/idée perso 4.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 4</h4><small>peuple demoniaque (gentil)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple demoniaque (gentil)/idée perso 5.jpeg', 'Peuple démoniaque - idée perso 5')">
+                    <img src="assets/perso/peuple demoniaque (gentil)/idée perso 5.jpeg" alt="">
+                    <div class="card-info"><h4>idée perso 5</h4><small>peuple demoniaque (gentil)</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Elfique (2)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple elfique/idée perso 1.jpg', 'Peuple elfique - idée perso 1')">
+                    <img src="assets/perso/peuple elfique/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple elfique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple elfique/idée perso 2.jpg', 'Peuple elfique - idée perso 2')">
+                    <img src="assets/perso/peuple elfique/idée perso 2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>peuple elfique</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Humain (13)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 1.jpg', 'Peuple humain - idée perso 1')">
+                    <img src="assets/perso/peuple humain/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 2.jpg', 'Peuple humain - idée perso 2')">
+                    <img src="assets/perso/peuple humain/idée perso 2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 3.jpg', 'Peuple humain - idée perso 3')">
+                    <img src="assets/perso/peuple humain/idée perso 3.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 3</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 4.jpg', 'Peuple humain - idée perso 4')">
+                    <img src="assets/perso/peuple humain/idée perso 4.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 4</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 5.jpg', 'Peuple humain - idée perso 5')">
+                    <img src="assets/perso/peuple humain/idée perso 5.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 5</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 6.jpg', 'Peuple humain - idée perso 6')">
+                    <img src="assets/perso/peuple humain/idée perso 6.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 6</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 7.jpg', 'Peuple humain - idée perso 7')">
+                    <img src="assets/perso/peuple humain/idée perso 7.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 7</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 8.jpg', 'Peuple humain - idée perso 8')">
+                    <img src="assets/perso/peuple humain/idée perso 8.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 8</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 9.jpg', 'Peuple humain - idée perso 9')">
+                    <img src="assets/perso/peuple humain/idée perso 9.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 9</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 10.jpg', 'Peuple humain - idée perso 10')">
+                    <img src="assets/perso/peuple humain/idée perso 10.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 10</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 11.png', 'Peuple humain - idée perso 11')">
+                    <img src="assets/perso/peuple humain/idée perso 11.png" alt="">
+                    <div class="card-info"><h4>idée perso 11</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 12.jpg', 'Peuple humain - idée perso 12')">
+                    <img src="assets/perso/peuple humain/idée perso 12.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 12</h4><small>peuple humain</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple humain/idée perso 13.jpg', 'Peuple humain - idée perso 13')">
+                    <img src="assets/perso/peuple humain/idée perso 13.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 13</h4><small>peuple humain</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Technologique (8)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 1.jpg', 'Peuple technologique - idée perso 1')">
+                    <img src="assets/perso/peuple technologique/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple technologique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 2.jpg', 'Peuple technologique - idée perso 2')">
+                    <img src="assets/perso/peuple technologique/idée perso 2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>peuple technologique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 3.jpg', 'Peuple technologique - idée perso 3')">
+                    <img src="assets/perso/peuple technologique/idée perso 3.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 3</h4><small>peuple technologique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 4.jpg', 'Peuple technologique - idée perso 4')">
+                    <img src="assets/perso/peuple technologique/idée perso 4.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 4</h4><small>peuple technologique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 5.jpg', 'Peuple technologique - idée perso 5')">
+                    <img src="assets/perso/peuple technologique/idée perso 5.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 5</h4><small>peuple technologique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 6.jpg', 'Peuple technologique - idée perso 6')">
+                    <img src="assets/perso/peuple technologique/idée perso 6.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 6</h4><small>peuple technologique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 7.jpg', 'Peuple technologique - idée perso 7')">
+                    <img src="assets/perso/peuple technologique/idée perso 7.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 7</h4><small>peuple technologique</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple technologique/idée perso 8.jpg', 'Peuple technologique - idée perso 8')">
+                    <img src="assets/perso/peuple technologique/idée perso 8.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 8</h4><small>peuple technologique</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Homme-Bête (6)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple (homme-bête)/idée perso 1.jpg', 'Homme-bête - idée perso 1')">
+                    <img src="assets/perso/peuple (homme-bête)/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple (homme-bête)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple (homme-bête)/idée perso 2.jpg', 'Homme-bête - idée perso 2')">
+                    <img src="assets/perso/peuple (homme-bête)/idée perso 2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>peuple (homme-bête)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple (homme-bête)/idée perso 3.jpg', 'Homme-bête - idée perso 3')">
+                    <img src="assets/perso/peuple (homme-bête)/idée perso 3.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 3</h4><small>peuple (homme-bête)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple (homme-bête)/idée perso 4.jpg', 'Homme-bête - idée perso 4')">
+                    <img src="assets/perso/peuple (homme-bête)/idée perso 4.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 4</h4><small>peuple (homme-bête)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple (homme-bête)/idée perso 5.jpg', 'Homme-bête - idée perso 5')">
+                    <img src="assets/perso/peuple (homme-bête)/idée perso 5.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 5</h4><small>peuple (homme-bête)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/peuple (homme-bête)/idée perso 6.jpg', 'Homme-bête - idée perso 6')">
+                    <img src="assets/perso/peuple (homme-bête)/idée perso 6.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 6</h4><small>peuple (homme-bête)</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple Vampirique (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple vampirique/idée perso 1.jpg', 'Peuple vampirique - idée perso 1')">
+                    <img src="assets/perso/peuple vampirique/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple vampirique</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple du Ciel (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple du ciel/idée perso 1.jpg', 'Peuple du ciel - idée perso 1')">
+                    <img src="assets/perso/peuple du ciel/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple du ciel</small></div>
+                </div>
+            </div>
+
+            <h3>Peuple de Mer (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/peuple de mer/idée perso 1.jpg', 'Peuple de mer - idée perso 1')">
+                    <img src="assets/perso/peuple de mer/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>peuple de mer</small></div>
+                </div>
+            </div>
+
+            <h3>Mort Blanche (Secte) (3)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/mort blache (secte)/idée perso  1.jpg', 'Mort blanche - idée perso 1')">
+                    <img src="assets/perso/mort blache (secte)/idée perso  1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>mort blache (secte)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/mort blache (secte)/idée perso 2.jpg', 'Mort blanche - idée perso 2')">
+                    <img src="assets/perso/mort blache (secte)/idée perso 2.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 2</h4><small>mort blache (secte)</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/mort blache (secte)/Epic Seven _ Blood Moon Haste.jpg', 'Mort blanche - Blood Moon Haste')">
+                    <img src="assets/perso/mort blache (secte)/Epic Seven _ Blood Moon Haste.jpg" alt="">
+                    <div class="card-info"><h4>Epic Seven _ Blood Moon Haste</h4><small>mort blache (secte)</small></div>
+                </div>
+            </div>
+
+            <h3>Perso Prins (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/perso prins/idée perso 1.jpg', 'Perso prins - idée perso 1')">
+                    <img src="assets/perso/perso prins/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>perso prins</small></div>
+                </div>
+            </div>
+
+            <h3>Autre - Déchu (2)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/autre/déchu/idée perso 1.jpg', 'Autre déchu - idée perso 1')">
+                    <img src="assets/perso/autre/déchu/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>autre/déchu</small></div>
+                </div>
+                <div class="card" onclick="openModal('assets/perso/autre/déchu/idée perso 1.1.jpg', 'Autre déchu - idée perso 1.1')">
+                    <img src="assets/perso/autre/déchu/idée perso 1.1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1.1</h4><small>autre/déchu</small></div>
+                </div>
+            </div>
+
+            <h3>Autre - Enfermé dans un Donjon (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/autre/enfermer dans un donjon/idée perso 1.jpg', 'Enfermé dans un donjon - idée perso 1')">
+                    <img src="assets/perso/autre/enfermer dans un donjon/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>enfermer dans un donjon</small></div>
+                </div>
+            </div>
+
+            <h3>Autre - Sujet d'Expérience (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal(\"assets/perso/autre/sujet d'experience/idée perso 1.jpg\", \"Sujet d'expérience - idée perso 1\")">
+                    <img src="assets/perso/autre/sujet d'experience/idée perso 1.jpg" alt="">
+                    <div class="card-info"><h4>idée perso 1</h4><small>sujet d'experience</small></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MONSTRES -->
+        <section id="monstre" class="section">
+            <h2>Monstres</h2>
+
+            <h3>Monstre Terrestre (22)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 1.jpg', 'Monstre terrestre 1')"><img src="assets/monstre/monstre terrestre/idée monstre 1.jpg" alt=""><div class="card-info"><h4>idée monstre 1</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 2.jpg', 'Monstre terrestre 2')"><img src="assets/monstre/monstre terrestre/idée monstre 2.jpg" alt=""><div class="card-info"><h4>idée monstre 2</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 3.jpg', 'Monstre terrestre 3')"><img src="assets/monstre/monstre terrestre/idée monstre 3.jpg" alt=""><div class="card-info"><h4>idée monstre 3</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 4.jpg', 'Monstre terrestre 4')"><img src="assets/monstre/monstre terrestre/idée monstre 4.jpg" alt=""><div class="card-info"><h4>idée monstre 4</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 5.jpg', 'Monstre terrestre 5')"><img src="assets/monstre/monstre terrestre/idée monstre 5.jpg" alt=""><div class="card-info"><h4>idée monstre 5</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 6.jpg', 'Monstre terrestre 6')"><img src="assets/monstre/monstre terrestre/idée monstre 6.jpg" alt=""><div class="card-info"><h4>idée monstre 6</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 7.jpg', 'Monstre terrestre 7')"><img src="assets/monstre/monstre terrestre/idée monstre 7.jpg" alt=""><div class="card-info"><h4>idée monstre 7</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 8.jpg', 'Monstre terrestre 8')"><img src="assets/monstre/monstre terrestre/idée monstre 8.jpg" alt=""><div class="card-info"><h4>idée monstre 8</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 9.jpg', 'Monstre terrestre 9')"><img src="assets/monstre/monstre terrestre/idée monstre 9.jpg" alt=""><div class="card-info"><h4>idée monstre 9</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 10.jpg', 'Monstre terrestre 10')"><img src="assets/monstre/monstre terrestre/idée monstre 10.jpg" alt=""><div class="card-info"><h4>idée monstre 10</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 11.jpg', 'Monstre terrestre 11')"><img src="assets/monstre/monstre terrestre/idée monstre 11.jpg" alt=""><div class="card-info"><h4>idée monstre 11</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 12.jpg', 'Monstre terrestre 12')"><img src="assets/monstre/monstre terrestre/idée monstre 12.jpg" alt=""><div class="card-info"><h4>idée monstre 12</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 13.webp', 'Monstre terrestre 13')"><img src="assets/monstre/monstre terrestre/idée monstre 13.webp" alt=""><div class="card-info"><h4>idée monstre 13</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 14.webp', 'Monstre terrestre 14')"><img src="assets/monstre/monstre terrestre/idée monstre 14.webp" alt=""><div class="card-info"><h4>idée monstre 14</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 15.webp', 'Monstre terrestre 15')"><img src="assets/monstre/monstre terrestre/idée monstre 15.webp" alt=""><div class="card-info"><h4>idée monstre 15</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 16.webp', 'Monstre terrestre 16')"><img src="assets/monstre/monstre terrestre/idée monstre 16.webp" alt=""><div class="card-info"><h4>idée monstre 16</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 17.jpg', 'Monstre terrestre 17')"><img src="assets/monstre/monstre terrestre/idée monstre 17.jpg" alt=""><div class="card-info"><h4>idée monstre 17</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 18.jpg', 'Monstre terrestre 18')"><img src="assets/monstre/monstre terrestre/idée monstre 18.jpg" alt=""><div class="card-info"><h4>idée monstre 18</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 19.jpg', 'Monstre terrestre 19')"><img src="assets/monstre/monstre terrestre/idée monstre 19.jpg" alt=""><div class="card-info"><h4>idée monstre 19</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 20.jpg', 'Monstre terrestre 20')"><img src="assets/monstre/monstre terrestre/idée monstre 20.jpg" alt=""><div class="card-info"><h4>idée monstre 20</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 21.jpeg', 'Monstre terrestre 21')"><img src="assets/monstre/monstre terrestre/idée monstre 21.jpeg" alt=""><div class="card-info"><h4>idée monstre 21</h4><small>monstre terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre terrestre/idée monstre 22.jpg', 'Monstre terrestre 22')"><img src="assets/monstre/monstre terrestre/idée monstre 22.jpg" alt=""><div class="card-info"><h4>idée monstre 22</h4><small>monstre terrestre</small></div></div>
+            </div>
+
+            <h3>Monstre Marin (14)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 1.jpeg', 'Monstre marin 1')"><img src="assets/monstre/monstre marin/idée monstre 1.jpeg" alt=""><div class="card-info"><h4>idée monstre 1</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 2.jpg', 'Monstre marin 2')"><img src="assets/monstre/monstre marin/idée monstre 2.jpg" alt=""><div class="card-info"><h4>idée monstre 2</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 3.jpg', 'Monstre marin 3')"><img src="assets/monstre/monstre marin/idée monstre 3.jpg" alt=""><div class="card-info"><h4>idée monstre 3</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 4.jpg', 'Monstre marin 4')"><img src="assets/monstre/monstre marin/idée monstre 4.jpg" alt=""><div class="card-info"><h4>idée monstre 4</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 5.jpg', 'Monstre marin 5')"><img src="assets/monstre/monstre marin/idée monstre 5.jpg" alt=""><div class="card-info"><h4>idée monstre 5</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 6.jpeg', 'Monstre marin 6')"><img src="assets/monstre/monstre marin/idée monstre 6.jpeg" alt=""><div class="card-info"><h4>idée monstre 6</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 7.jpg', 'Monstre marin 7')"><img src="assets/monstre/monstre marin/idée monstre 7.jpg" alt=""><div class="card-info"><h4>idée monstre 7</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 8.jpg', 'Monstre marin 8')"><img src="assets/monstre/monstre marin/idée monstre 8.jpg" alt=""><div class="card-info"><h4>idée monstre 8</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 9.jpg', 'Monstre marin 9')"><img src="assets/monstre/monstre marin/idée monstre 9.jpg" alt=""><div class="card-info"><h4>idée monstre 9</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 10.jpg', 'Monstre marin 10')"><img src="assets/monstre/monstre marin/idée monstre 10.jpg" alt=""><div class="card-info"><h4>idée monstre 10</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 11.jpg', 'Monstre marin 11')"><img src="assets/monstre/monstre marin/idée monstre 11.jpg" alt=""><div class="card-info"><h4>idée monstre 11</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 12.webp', 'Monstre marin 12')"><img src="assets/monstre/monstre marin/idée monstre 12.webp" alt=""><div class="card-info"><h4>idée monstre 12</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 13.webp', 'Monstre marin 13')"><img src="assets/monstre/monstre marin/idée monstre 13.webp" alt=""><div class="card-info"><h4>idée monstre 13</h4><small>monstre marin</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre marin/idée monstre 14.jpg', 'Monstre marin 14')"><img src="assets/monstre/monstre marin/idée monstre 14.jpg" alt=""><div class="card-info"><h4>idée monstre 14</h4><small>monstre marin</small></div></div>
+            </div>
+
+            <h3>Monstre Aérien (4)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/monstre/monstre aerien/idée monstre 1.jpg', 'Monstre aérien 1')"><img src="assets/monstre/monstre aerien/idée monstre 1.jpg" alt=""><div class="card-info"><h4>idée monstre 1</h4><small>monstre aerien</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre aerien/idée monstre 3.jpg', 'Monstre aérien 3')"><img src="assets/monstre/monstre aerien/idée monstre 3.jpg" alt=""><div class="card-info"><h4>idée monstre 3</h4><small>monstre aerien</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre aerien/idée monstre 4.jpg', 'Monstre aérien 4')"><img src="assets/monstre/monstre aerien/idée monstre 4.jpg" alt=""><div class="card-info"><h4>idée monstre 4</h4><small>monstre aerien</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/monstre aerien/idée monstre 5.webp', 'Monstre aérien 5')"><img src="assets/monstre/monstre aerien/idée monstre 5.webp" alt=""><div class="card-info"><h4>idée monstre 5</h4><small>monstre aerien</small></div></div>
+            </div>
+
+            <h3>Monstre Technologique (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/monstre/monstre technologique/idée monstre 1.jpg', 'Monstre technologique 1')"><img src="assets/monstre/monstre technologique/idée monstre 1.jpg" alt=""><div class="card-info"><h4>idée monstre 1</h4><small>monstre technologique</small></div></div>
+            </div>
+
+            <h3>Boss - Mini Boss Terrestre (2)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/monstre/boss/mini boss/mini boss terrestre/idée monstre 1.jpg', 'Mini boss terrestre 1')"><img src="assets/monstre/boss/mini boss/mini boss terrestre/idée monstre 1.jpg" alt=""><div class="card-info"><h4>idée monstre 1</h4><small>mini boss terrestre</small></div></div>
+                <div class="card" onclick="openModal('assets/monstre/boss/mini boss/mini boss terrestre/idée monstre 2.webp', 'Mini boss terrestre 2')"><img src="assets/monstre/boss/mini boss/mini boss terrestre/idée monstre 2.webp" alt=""><div class="card-info"><h4>idée monstre 2</h4><small>mini boss terrestre</small></div></div>
+            </div>
+
+            <h3>Boss - Boss (Quête) (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/monstre/boss/boss (Quête)/idée monstre 1.jpg', 'Boss Quête 1')"><img src="assets/monstre/boss/boss (Quête)/idée monstre 1.jpg" alt=""><div class="card-info"><h4>idée monstre 1</h4><small>boss (Quête)</small></div></div>
+            </div>
+
+            <h3>Boss - Dieu Maléfique (méchant) (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/monstre/boss/dieu malefique (mechant)/idée monstre 1.jpg', 'Dieu maléfique 1')"><img src="assets/monstre/boss/dieu malefique (mechant)/idée monstre 1.jpg" alt=""><div class="card-info"><h4>idée monstre 1</h4><small>dieu malefique (mechant)</small></div></div>
+            </div>
+        </section>
+
+        <!-- MAPS -->
+        <section id="map" class="section">
+            <h2>Maps</h2>
+
+            <h3>Map Principale (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/map/idée map 1.jpg', 'Map - idée map 1')"><img src="assets/map/idée map 1.jpg" alt=""><div class="card-info"><h4>idée map 1</h4><small>map</small></div></div>
+            </div>
+
+            <h3>Paysage (4)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/map/paysage/idée map 1.jpg', 'Paysage 1')"><img src="assets/map/paysage/idée map 1.jpg" alt=""><div class="card-info"><h4>idée map 1</h4><small>paysage</small></div></div>
+                <div class="card" onclick="openModal('assets/map/paysage/idée map 2.jpg', 'Paysage 2')"><img src="assets/map/paysage/idée map 2.jpg" alt=""><div class="card-info"><h4>idée map 2</h4><small>paysage</small></div></div>
+                <div class="card" onclick="openModal('assets/map/paysage/idée map 3.jpg', 'Paysage 3')"><img src="assets/map/paysage/idée map 3.jpg" alt=""><div class="card-info"><h4>idée map 3</h4><small>paysage</small></div></div>
+                <div class="card" onclick="openModal('assets/map/paysage/idée map 4.jpg', 'Paysage 4')"><img src="assets/map/paysage/idée map 4.jpg" alt=""><div class="card-info"><h4>idée map 4</h4><small>paysage</small></div></div>
+            </div>
+
+            <h3>Ville (3)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/map/ville/idée map 1.jpg', 'Ville 1')"><img src="assets/map/ville/idée map 1.jpg" alt=""><div class="card-info"><h4>idée map 1</h4><small>ville</small></div></div>
+                <div class="card" onclick="openModal('assets/map/ville/idée map 2.jpg', 'Ville 2')"><img src="assets/map/ville/idée map 2.jpg" alt=""><div class="card-info"><h4>idée map 2</h4><small>ville</small></div></div>
+                <div class="card" onclick="openModal('assets/map/ville/idée map 3.jpg', 'Ville 3')"><img src="assets/map/ville/idée map 3.jpg" alt=""><div class="card-info"><h4>idée map 3</h4><small>ville</small></div></div>
+            </div>
+
+            <h3>Histoire (Quête) (2)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/map/histoire (quête)/idée map 1.jpg', 'Histoire/Quête 1')"><img src="assets/map/histoire (quête)/idée map 1.jpg" alt=""><div class="card-info"><h4>idée map 1</h4><small>histoire (quête)</small></div></div>
+                <div class="card" onclick="openModal('assets/map/histoire (quête)/idée map 2.jpg', 'Histoire/Quête 2')"><img src="assets/map/histoire (quête)/idée map 2.jpg" alt=""><div class="card-info"><h4>idée map 2</h4><small>histoire (quête)</small></div></div>
+            </div>
+
+            <h3>Vue (Ciel) (2)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/map/vue (ciel)/idée map 1.jpg', 'Vue ciel 1')"><img src="assets/map/vue (ciel)/idée map 1.jpg" alt=""><div class="card-info"><h4>idée map 1</h4><small>vue (ciel)</small></div></div>
+                <div class="card" onclick="openModal('assets/map/vue (ciel)/idée map 2.jpg', 'Vue ciel 2')"><img src="assets/map/vue (ciel)/idée map 2.jpg" alt=""><div class="card-info"><h4>idée map 2</h4><small>vue (ciel)</small></div></div>
+            </div>
+        </section>
+
+        <!-- ITEMS -->
+        <section id="item" class="section">
+            <h2>Items</h2>
+
+            <h3>Arme - Épée (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/item/arme/épée/idée épée 1.jpg', 'Épée 1')"><img src="assets/item/arme/épée/idée épée 1.jpg" alt=""><div class="card-info"><h4>idée épée 1</h4><small>arme/épée</small></div></div>
+            </div>
+        </section>
+
+        <!-- ARMES (Reco Alpha) -->
+        <section id="armes" class="section">
+            <h2>Armes - Reco Alpha (30 total)</h2>
+
+            <div class="summary-box">
+                <div class="summary-item"><div class="number">5</div><div class="label">Types d'armes</div></div>
+                <div class="summary-item"><div class="number">30</div><div class="label">Armes totales</div></div>
+                <div class="summary-item"><div class="number">5</div><div class="label">5★ (Gacha exclusif)</div></div>
+                <div class="summary-item"><div class="number">10</div><div class="label">4★ (Gacha + Events)</div></div>
+                <div class="summary-item"><div class="number">15</div><div class="label">3★ (Drops, craft)</div></div>
+            </div>
+
+            <h3>Épée/Sword - DPS Melee équilibré (6)</h3>
+            <div class="grid">
+                <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Épée 5★ #1</h4><small>épée <span class="rarity-badge star5">5★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Épée 4★ #1</h4><small>épée <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Épée 4★ #2</h4><small>épée <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Épée 3★ #1</h4><small>épée <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Épée 3★ #2</h4><small>épée <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Épée 3★ #3</h4><small>épée <span class="rarity-badge star3">3★</span></small></div></div>
+            </div>
+
+            <h3>Grande Arme - DPS Burst/Lourd (6)</h3>
+            <div class="grid">
+                <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Grande Arme 5★ #1</h4><small>grande arme <span class="rarity-badge star5">5★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Grande Arme 4★ #1</h4><small>grande arme <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Grande Arme 4★ #2</h4><small>grande arme <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Grande Arme 3★ #1</h4><small>grande arme <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Grande Arme 3★ #2</h4><small>grande arme <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Grande Arme 3★ #3</h4><small>grande arme <span class="rarity-badge star3">3★</span></small></div></div>
+            </div>
+
+            <h3>Arme Distance - DPS Ranged (6)</h3>
+            <div class="grid">
+                <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Arc/Pistolet 5★ #1</h4><small>distance <span class="rarity-badge star5">5★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Arc/Pistolet 4★ #1</h4><small>distance <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Arc/Pistolet 4★ #2</h4><small>distance <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★</span></div><div class="card-info"><h4>Arc/Pistolet 3★ #1</h4><small>distance <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★</span></div><div class="card-info"><h4>Arc/Pistolet 3★ #2</h4><small>distance <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★</span></div><div class="card-info"><h4>Arc/Pistolet 3★ #3</h4><small>distance <span class="rarity-badge star3">3★</span></small></div></div>
+            </div>
+
+            <h3>Arme Magique - Support/Caster (6)</h3>
+            <div class="grid">
+                <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Catalyst/Staff 5★ #1</h4><small>magique <span class="rarity-badge star5">5★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Catalyst/Staff 4★ #1</h4><small>magique <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Catalyst/Staff 4★ #2</h4><small>magique <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★</span></div><div class="card-info"><h4>Catalyst/Staff 3★ #1</h4><small>magique <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★</span></div><div class="card-info"><h4>Catalyst/Staff 3★ #2</h4><small>magique <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★</span></div><div class="card-info"><h4>Catalyst/Staff 3★ #3</h4><small>magique <span class="rarity-badge star3">3★</span></small></div></div>
+            </div>
+
+            <h3>Arme Hybride - Flex/Unique (6)</h3>
+            <div class="grid">
+                <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 5★ #1</h4><small>hybride <span class="rarity-badge star5">5★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 4★ #1</h4><small>hybride <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 4★ #2</h4><small>hybride <span class="rarity-badge star4">4★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 3★ #1</h4><small>hybride <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 3★ #2</h4><small>hybride <span class="rarity-badge star3">3★</span></small></div></div>
+                <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 3★ #3</h4><small>hybride <span class="rarity-badge star3">3★</span></small></div></div>
+            </div>
+        </section>
+
+        <!-- ANIMAUX -->
+        <section id="animeaux" class="section">
+            <h2>Animaux</h2>
+
+            <h3>Mythique (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/animeaux/mythique/idée mythique 1.jpg', 'Animal mythique 1')"><img src="assets/animeaux/mythique/idée mythique 1.jpg" alt=""><div class="card-info"><h4>idée mythique 1</h4><small>animeaux/mythique</small></div></div>
+            </div>
+        </section>
+
+        <!-- COMPÉTENCES -->
+        <section id="competance" class="section">
+            <h2>Compétences</h2>
+
+            <h3>Compétences (3)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/competance/idée 1.jpg', 'Compétence - idée 1')"><img src="assets/perso/competance/idée 1.jpg" alt=""><div class="card-info"><h4>idée 1</h4><small>competance</small></div></div>
+                <div class="card" onclick="openModal('assets/perso/competance/idée 1.1.jpg', 'Compétence - idée 1.1')"><img src="assets/perso/competance/idée 1.1.jpg" alt=""><div class="card-info"><h4>idée 1.1</h4><small>competance</small></div></div>
+                <div class="card" onclick="openModal('assets/perso/competance/Idée (malediction).jpg', 'Compétence - Malédiction')"><img src="assets/perso/competance/Idée (malediction).jpg" alt=""><div class="card-info"><h4>Idée (malediction)</h4><small>competance</small></div></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal" id="modal" onclick="closeModal()">
+        <span class="modal-close">&times;</span>
+        <img id="modal-img" src="" alt="">
+        <div class="modal-info">
+            <h3 id="modal-title"></h3>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function openModal(src, title) {
+            document.getElementById('modal-img').src = src;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
