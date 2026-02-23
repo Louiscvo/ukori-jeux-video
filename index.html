@@ -158,6 +158,40 @@
         }
         .summary-item .number { font-size: 2rem; font-weight: bold; color: #e94560; }
         .summary-item .label { font-size: 0.85rem; opacity: 0.7; }
+
+        /* Upload overlay */
+        .card { position: relative; }
+        .upload-btn {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(233, 69, 96, 0.9);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+        .card:hover .upload-btn { opacity: 1; }
+        .upload-btn:hover { background: #ff4567; transform: scale(1.1); }
+        .card-image-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+        }
+        .card-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -720,7 +754,11 @@
         </div>
     </div>
 
+    <input type="file" id="imageUpload" accept="image/*" style="display:none">
+
     <script>
+        let currentCardId = null;
+
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -741,6 +779,74 @@
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') closeModal();
         });
+
+        // Upload functionality
+        function initUploadButtons() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                const cardId = 'card-' + index;
+                card.dataset.cardId = cardId;
+
+                // Add upload button if not exists
+                if (!card.querySelector('.upload-btn')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'upload-btn';
+                    btn.innerHTML = '📷';
+                    btn.title = 'Changer l\'image';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        currentCardId = cardId;
+                        document.getElementById('imageUpload').click();
+                    };
+                    card.insertBefore(btn, card.firstChild);
+                }
+
+                // Load saved image
+                const savedImg = localStorage.getItem(cardId);
+                if (savedImg) {
+                    applyImageToCard(card, savedImg);
+                }
+            });
+        }
+
+        function applyImageToCard(card, imgSrc) {
+            const placeholder = card.querySelector('.weapon-placeholder');
+            const existingImg = card.querySelector('img');
+
+            if (placeholder) {
+                // Replace placeholder with image
+                const img = document.createElement('img');
+                img.src = imgSrc;
+                img.style.width = '100%';
+                img.style.height = '200px';
+                img.style.objectFit = 'cover';
+                placeholder.style.display = 'none';
+                placeholder.parentNode.insertBefore(img, placeholder);
+            } else if (existingImg) {
+                existingImg.src = imgSrc;
+            }
+        }
+
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && currentCardId) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgData = event.target.result;
+                    localStorage.setItem(currentCardId, imgData);
+
+                    const card = document.querySelector(`[data-card-id="${currentCardId}"]`);
+                    if (card) {
+                        applyImageToCard(card, imgData);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = '';
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initUploadButtons);
     </script>
 </body>
 </html>
