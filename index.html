@@ -171,9 +171,9 @@
         <button onclick="showSection('monstre')">Monstres</button>
         <button onclick="showSection('map')">Maps</button>
         <button onclick="showSection('item')">Items</button>
-        <button onclick="showSection('alpha')">Alpha</button>
         <button onclick="showSection('animeaux')">Animaux</button>
         <button onclick="showSection('competance')">Compétences</button>
+        <button onclick="showSection('alpha')">Alpha</button>
     </nav>
 
     <main>
@@ -599,13 +599,35 @@
             </div>
         </section>
 
+        <!-- ANIMAUX -->
+        <section id="animeaux" class="section">
+            <h2>Animaux</h2>
+
+            <h3>Mythique (1)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/animeaux/mythique/idée mythique 1.jpg', 'Animal mythique 1')"><img src="assets/animeaux/mythique/idée mythique 1.jpg" alt=""><div class="card-info"><h4>idée mythique 1</h4><small>animeaux/mythique</small></div></div>
+            </div>
+        </section>
+
+        <!-- COMPÉTENCES -->
+        <section id="competance" class="section">
+            <h2>Compétences</h2>
+
+            <h3>Compétences (3)</h3>
+            <div class="grid">
+                <div class="card" onclick="openModal('assets/perso/competance/idée 1.jpg', 'Compétence - idée 1')"><img src="assets/perso/competance/idée 1.jpg" alt=""><div class="card-info"><h4>idée 1</h4><small>competance</small></div></div>
+                <div class="card" onclick="openModal('assets/perso/competance/idée 1.1.jpg', 'Compétence - idée 1.1')"><img src="assets/perso/competance/idée 1.1.jpg" alt=""><div class="card-info"><h4>idée 1.1</h4><small>competance</small></div></div>
+                <div class="card" onclick="openModal('assets/perso/competance/Idée (malediction).jpg', 'Compétence - Malédiction')"><img src="assets/perso/competance/Idée (malediction).jpg" alt=""><div class="card-info"><h4>Idée (malediction)</h4><small>competance</small></div></div>
+            </div>
+        </section>
+
         <!-- ALPHA -->
         <section id="alpha" class="section">
             <h2>Alpha - Recommandations</h2>
 
             <h3>Armes (30)</h3>
 
-            <h4>Épée/Sword - DPS Melee équilibré (6)</h3>
+            <h4>Épée/Sword - DPS Melee équilibré (6)</h4>
             <div class="grid">
                 <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Épée 5★ #1</h4><small>épée <span class="rarity-badge star5">5★</span></small></div></div>
                 <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Épée 4★ #1</h4><small>épée <span class="rarity-badge star4">4★</span></small></div></div>
@@ -615,7 +637,7 @@
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>⚔️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Épée 3★ #3</h4><small>épée <span class="rarity-badge star3">3★</span></small></div></div>
             </div>
 
-            <h3>Grande Arme - DPS Burst/Lourd (6)</h3>
+            <h4>Grande Arme - DPS Burst/Lourd (6)</h4>
             <div class="grid">
                 <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Grande Arme 5★ #1</h4><small>grande arme <span class="rarity-badge star5">5★</span></small></div></div>
                 <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Grande Arme 4★ #1</h4><small>grande arme <span class="rarity-badge star4">4★</span></small></div></div>
@@ -625,7 +647,7 @@
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🗡️<span class="stars-display">★★★</span></div><div class="card-info"><h4>Grande Arme 3★ #3</h4><small>grande arme <span class="rarity-badge star3">3★</span></small></div></div>
             </div>
 
-            <h3>Arme Distance - DPS Ranged (6)</h3>
+            <h4>Arme Distance - DPS Ranged (6)</h4>
             <div class="grid">
                 <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Arc/Pistolet 5★ #1</h4><small>distance <span class="rarity-badge star5">5★</span></small></div></div>
                 <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Arc/Pistolet 4★ #1</h4><small>distance <span class="rarity-badge star4">4★</span></small></div></div>
@@ -635,7 +657,7 @@
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🏹<span class="stars-display">★★★</span></div><div class="card-info"><h4>Arc/Pistolet 3★ #3</h4><small>distance <span class="rarity-badge star3">3★</span></small></div></div>
             </div>
 
-            <h3>Arme Magique - Support/Caster (6)</h3>
+            <h4>Arme Magique - Support/Caster (6)</h4>
             <div class="grid">
                 <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Catalyst/Staff 5★ #1</h4><small>magique <span class="rarity-badge star5">5★</span></small></div></div>
                 <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Catalyst/Staff 4★ #1</h4><small>magique <span class="rarity-badge star4">4★</span></small></div></div>
@@ -645,7 +667,7 @@
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🔮<span class="stars-display">★★★</span></div><div class="card-info"><h4>Catalyst/Staff 3★ #3</h4><small>magique <span class="rarity-badge star3">3★</span></small></div></div>
             </div>
 
-            <h3>Arme Hybride - Flex/Unique (6)</h3>
+            <h4>Arme Hybride - Flex/Unique (6)</h4>
             <div class="grid">
                 <div class="card"><div class="weapon-placeholder star5"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 5★ #1</h4><small>hybride <span class="rarity-badge star5">5★</span></small></div></div>
                 <div class="card"><div class="weapon-placeholder star4"><span class="proto-tag">Prototype</span>🥊<span class="stars-display">★★★★</span></div><div class="card-info"><h4>Gauntlet/Polearm 4★ #1</h4><small>hybride <span class="rarity-badge star4">4★</span></small></div></div>
@@ -674,7 +696,7 @@
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>👤<span class="stars-display">★★★</span></div><div class="card-info"><h4>Perso 3★ #3</h4><small>personnage <span class="rarity-badge star3">R</span></small></div></div>
             </div>
 
-            <h3>Maps (2 total)</h3>
+            <h3>Maps (2)</h3>
             <div class="grid">
                 <div class="card"><div class="weapon-placeholder star5" style="height:150px;"><span class="proto-tag">Prototype</span>🗺️<span class="stars-display">Zone 1</span></div><div class="card-info"><h4>Map #1</h4><small>monde principal</small></div></div>
                 <div class="card"><div class="weapon-placeholder star4" style="height:150px;"><span class="proto-tag">Prototype</span>🗺️<span class="stars-display">Zone 2</span></div><div class="card-info"><h4>Map #2</h4><small>monde secondaire</small></div></div>
@@ -716,28 +738,6 @@
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🦎<span class="stars-display">★★★</span></div><div class="card-info"><h4>Animal Commun #6</h4><small>animal <span class="rarity-badge star3">Commun</span></small></div></div>
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🐸<span class="stars-display">★★★</span></div><div class="card-info"><h4>Animal Commun #7</h4><small>animal <span class="rarity-badge star3">Commun</span></small></div></div>
                 <div class="card"><div class="weapon-placeholder star3"><span class="proto-tag">Prototype</span>🦋<span class="stars-display">★★★</span></div><div class="card-info"><h4>Animal Commun #8</h4><small>animal <span class="rarity-badge star3">Commun</span></small></div></div>
-            </div>
-        </section>
-
-        <!-- ANIMAUX -->
-        <section id="animeaux" class="section">
-            <h2>Animaux</h2>
-
-            <h3>Mythique (1)</h3>
-            <div class="grid">
-                <div class="card" onclick="openModal('assets/animeaux/mythique/idée mythique 1.jpg', 'Animal mythique 1')"><img src="assets/animeaux/mythique/idée mythique 1.jpg" alt=""><div class="card-info"><h4>idée mythique 1</h4><small>animeaux/mythique</small></div></div>
-            </div>
-        </section>
-
-        <!-- COMPÉTENCES -->
-        <section id="competance" class="section">
-            <h2>Compétences</h2>
-
-            <h3>Compétences (3)</h3>
-            <div class="grid">
-                <div class="card" onclick="openModal('assets/perso/competance/idée 1.jpg', 'Compétence - idée 1')"><img src="assets/perso/competance/idée 1.jpg" alt=""><div class="card-info"><h4>idée 1</h4><small>competance</small></div></div>
-                <div class="card" onclick="openModal('assets/perso/competance/idée 1.1.jpg', 'Compétence - idée 1.1')"><img src="assets/perso/competance/idée 1.1.jpg" alt=""><div class="card-info"><h4>idée 1.1</h4><small>competance</small></div></div>
-                <div class="card" onclick="openModal('assets/perso/competance/Idée (malediction).jpg', 'Compétence - Malédiction')"><img src="assets/perso/competance/Idée (malediction).jpg" alt=""><div class="card-info"><h4>Idée (malediction)</h4><small>competance</small></div></div>
             </div>
         </section>
     </main>
